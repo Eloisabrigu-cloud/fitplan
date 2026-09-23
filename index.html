@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#f7f5f0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FitPlan">
+<link rel="manifest" href="manifest.webmanifest">
+<title>FitPlan</title>
+<style>
+:root{--bg:#f7f5f0;--card:#fff;--ink:#20211f;--muted:#77766f;--accent:#6b7f63;--line:#e7e3db;--soft:#eeeae2}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Arial,sans-serif;color:var(--ink)}
+.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:88px}.top{padding:24px 18px 8px;display:flex;justify-content:space-between;align-items:center}.logo{font-size:26px;font-weight:850}.avatar{width:38px;height:38px;border-radius:50%;background:#ddd8cd;display:grid;place-items:center;font-weight:700}
+.page{display:none;padding:12px 18px}.page.active{display:block}.hello{font-size:29px;font-weight:850;margin:8px 0}.sub,.small{font-size:13px;color:var(--muted);line-height:1.45}h2{font-size:23px;margin:7px 0 15px}h3{margin:0 0 7px;font-size:16px}.section{margin-top:15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:12px}.wide{grid-column:1/-1}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.metric{font-size:25px;font-weight:850}.label{font-size:12px;color:var(--muted)}.pill{background:var(--soft);padding:6px 9px;border-radius:99px;font-size:12px}.btn{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:11px 14px;font-weight:750}.btn.green{background:var(--accent)}.btn.alt{background:var(--soft);color:var(--ink)}.progress{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--accent);border-radius:99px;width:0}.item{padding:13px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}.check{width:23px;height:23px;border:2px solid #cfc9bd;border-radius:7px;background:#fff;flex:0 0 auto}.check.on{background:var(--accent);border-color:var(--accent)}.check.on:after{content:"✓";color:white;display:block;text-align:center;font-weight:800}.bottom{position:fixed;z-index:5;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);display:grid;grid-template-columns:repeat(4,1fr);background:#fffdf9ee;backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom))}.nav{border:0;background:none;color:#85827a;font-size:11px}.nav.active{color:var(--ink);font-weight:800}.icon{font-size:19px;display:block}.input,.select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:15px}.toast{position:fixed;z-index:10;bottom:96px;left:50%;transform:translateX(-50%);background:#20211f;color:#fff;padding:10px 14px;border-radius:12px;display:none;font-size:13px}.notice{background:#f1eee6;border-radius:14px;padding:12px;font-size:12px;color:#5f5d56}.install{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="logo">FitPlan</div><div class="avatar">E</div></header>
+
+<main id="home" class="page active">
+<div class="hello">Hola 👋</div><div class="sub" id="date"></div>
+<div class="section grid">
+<div class="card"><div class="label">Objetivo kcal</div><div class="metric">1.650</div><div class="small">punto de partida</div></div>
+<div class="card"><div class="label">Proteína</div><div class="metric">110–125 g</div><div class="small">objetivo diario</div></div>
+<div class="card wide"><div class="row"><div><h3>Progreso de la semana</h3><div class="small" id="weekly">0 entrenamientos</div></div><b id="pct">0%</b></div><div class="progress" style="margin-top:10px"><i id="bar"></i></div></div>
+<div class="card wide"><div class="row"><div><h3>Entrenamiento de hoy</h3><div class="small" id="todayWorkout">Día 1 · Pierna + glúteo</div></div><button class="btn green" onclick="go('workout')">Abrir</button></div></div>
+</div>
+<div class="section card"><div class="row"><div><h3>Agua</h3><div class="small"><span id="water">0</span> / 2,0 L</div></div><button class="btn alt" onclick="addWater()">+250 ml</button></div></div>
+</main>
+
+<main id="workout" class="page">
+<h2>Entrenamiento</h2>
+<div class="notice">Regla: trabaja sin dolor. Si aparece dolor que baja por la pierna, hormigueo, adormecimiento o debilidad, detén el ejercicio y consulta con tu profesional sanitario.</div>
+<div id="workouts" class="section"></div>
+</main>
+
+<main id="food" class="page">
+<h2>Alimentación</h2><div class="small">Menú orientativo alrededor de 1.650 kcal/día. Las cantidades pueden ajustarse según evolución y necesidades reales.</div>
+<div id="menu" class="section"></div>
+<div class="card"><h3>Lista de compra</h3><div id="shopping"></div></div>
+</main>
+
+<main id="profile" class="page">
+<h2>Mi progreso</h2>
+<div class="card"><h3>Datos</h3>
+<div class="section"><label class="small">Peso actual (kg)</label><input id="weight" class="input" type="number" step="0.1" value="70"></div>
+<div class="section"><label class="small">Objetivo diario de kcal</label><input class="input" value="1650" disabled></div>
+<div class="section"><button class="btn green" onclick="saveWeight()">Guardar peso</button></div>
+</div>
+<div class="card"><h3>Resumen</h3><div class="row"><span class="small">Peso guardado</span><b id="savedWeight">70 kg</b></div><div class="row section"><span class="small">Agua de hoy</span><b id="savedWater">0 L</b></div><div class="row section"><span class="small">Entrenos completados</span><b id="savedWorkouts">0</b></div></div>
+<div class="card"><h3>Instalación</h3><div class="small">En Safari: Compartir → Añadir a pantalla de inicio. Así FitPlan queda como un icono de app en tu iPhone.</div></div>
+</main>
+
+<nav class="bottom">
+<button class="nav active" onclick="go('home',this)"><span class="icon">⌂</span>Inicio</button>
+<button class="nav" onclick="go('workout',this)"><span class="icon">🏋️</span>Entreno</button>
+<button class="nav" onclick="go('food',this)"><span class="icon">🥗</span>Comida</button>
+<button class="nav" onclick="go('profile',this)"><span class="icon">○</span>Progreso</button>
+</nav>
+</div><div id="toast" class="toast"></div>
+
+<script>
+const workouts=[
+["Día 1 · Pierna + glúteo",[
+["Calentamiento","5–8 min · caminar + movilidad suave"],
+["Prensa","3 × 10 · descanso 90 s"],
+["Hip thrust","3 × 10 · solo si no provoca dolor"],
+["Extensión de cuádriceps","3 × 12 · 60 s"],
+["Curl femoral","3 × 12 · 60 s"],
+["Abductores","3 × 15 · 60 s"],
+["Core de estabilidad","3 series · técnica controlada"]]],
+["Día 2 · Tren superior",[
+["Remo con pecho apoyado","3 × 10"],
+["Jalón al pecho","3 × 10"],
+["Press de pecho en máquina","3 × 10"],
+["Elevaciones laterales","3 × 12"],
+["Bíceps en polea","2 × 12"],
+["Tríceps en polea","2 × 12"]]],
+["Día 3 · Pierna + glúteo",[
+["Calentamiento","5–8 min"],
+["Prensa","3 × 10"],
+["Hip thrust","3 × 10 · si es indoloro"],
+["Curl femoral","3 × 12"],
+["Extensión de cuádriceps","3 × 12"],
+["Abductores","3 × 15"]]]
+];
+const days=[
+["Lunes",[["Desayuno","2 huevos + 2 claras, tostada integral, tomate y kiwi"],["Comida","150 g pollo + 180 g patata + ensalada + 10 g aceite de oliva"],["Merienda","200 g yogur alto en proteína + frutos rojos + 15 g almendras"],["Cena","150 g salmón + 150 g arroz cocido + verduras"]]],
+["Martes",[["Desayuno","50 g avena + 200 ml leche + yogur alto en proteína + 1/2 plátano"],["Comida","150 g pavo + 70 g arroz en crudo + verduras + 10 g aceite"],["Merienda","Fruta + 2 tortitas de maíz + 60 g queso fresco"],["Cena","Tortilla de 2 huevos + 150 g claras + ensalada + 150 g patata"]]],
+["Miércoles",[["Desayuno","2 tostadas integrales + 80 g queso fresco + tomate + fruta"],["Comida","150 g merluza + 200 g patata + verduras + 10 g aceite"],["Merienda","200 g yogur alto en proteína + 15 g nueces + frutos rojos"],["Cena","150 g pollo + 60 g pasta en crudo + verduras"]]],
+["Jueves",[["Desayuno","50 g avena + yogur alto en proteína + canela + fresas"],["Comida","150 g ternera magra + 60 g arroz en crudo + verduras + 10 g aceite"],["Merienda","Plátano pequeño + 15 g crema de cacahuete + yogur"],["Cena","150 g pavo + 200 g patata + ensalada"]]],
+["Viernes",[["Desayuno","2 huevos + 2 claras + tostada integral + naranja"],["Comida","150 g salmón + 60 g arroz en crudo + verduras"],["Merienda","200 g yogur alto en proteína + kiwi + 15 g almendras"],["Cena","150 g pollo + 180 g patata + verduras + 10 g aceite"]]],
+["Sábado",[["Desayuno","50 g avena + 200 ml leche + yogur + 1/2 plátano"],["Comida","150 g pavo + 70 g pasta en crudo + tomate y verduras"],["Merienda","2 tortitas de maíz + 70 g queso fresco + fruta"],["Cena","150 g merluza + 180 g patata + verduras + 10 g aceite"]]],
+["Domingo",[["Desayuno","2 tostadas integrales + 2 huevos + tomate + fruta"],["Comida","150 g pollo + 70 g arroz en crudo + verduras + 10 g aceite"],["Merienda","200 g yogur alto en proteína + frutos rojos + 15 g nueces"],["Cena","Tortilla de 2 huevos + 150 g claras + 150 g patata + ensalada"]]]
+];
+const shop=["Huevos (18)","Claras (1 brick)","Pollo (~750 g)","Pavo (~600 g)","Salmón (~450 g)","Merluza (~450 g)","Ternera magra (~150 g)","Yogur alto en proteína/griego (7–10)","Queso fresco (~250 g)","Leche (~1 L)","Avena (~250 g)","Arroz (~500 g)","Pasta (~250 g)","Patatas (~1,5 kg)","Pan integral","Tortitas de maíz","Verduras variadas (~2,5–3 kg)","Hojas verdes","Kiwi, plátano, naranja y fruta variada","Frutos rojos/fresas (~500 g)","Almendras/nueces (~150 g)","Crema de cacahuete","Aceite de oliva","Canela"];
+const state=JSON.parse(localStorage.getItem("fitplan")||'{"water":0,"workouts":0,"weight":70,"checks":{}}');
+function save(){localStorage.setItem("fitplan",JSON.stringify(state));update()}
+function toggleCheck(key,el){state.checks[key]=!state.checks[key];el.classList.toggle("on",state.checks[key]);save()}
+function addWater(){state.water=Math.min(2.5,Math.round((state.water+.25)*100)/100);save();toast("Agua registrada 💧")}
+function saveWeight(){state.weight=parseFloat(document.getElementById("weight").value)||state.weight;save();toast("Peso guardado ✓")}
+function finishWorkout(){state.workouts=Math.min(3,state.workouts+1);save();toast("Entrenamiento completado ✓")}
+function go(id,el){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));if(el)el.classList.add("active")}
+function toast(s){let t=document.getElementById("toast");t.textContent=s;t.style.display="block";clearTimeout(window.tt);window.tt=setTimeout(()=>t.style.display="none",1700)}
+function render(){document.getElementById("workouts").innerHTML=workouts.map((w,wi)=>`<div class="card"><div class="row"><h3>${w[0]}</h3><span class="pill">${wi==0?"Lun":wi==1?"Mié":"Vie"}</span></div>${w[1].map((x,i)=>{let k=`w${wi}-${i}`;return `<div class="item"><div class="row"><div><b>${x[0]}</b><div class="small">${x[1]}</div></div><button class="check ${state.checks[k]?"on":""}" onclick="toggleCheck('${k}',this)"></button></div></div>`}).join("")}<div class="section"><button class="btn green" onclick="finishWorkout()">Finalizar día</button></div></div>`).join("");
+document.getElementById("menu").innerHTML=days.map((d,di)=>`<div class="card"><div class="row"><h3>${d[0]}</h3><span class="pill">~1.650 kcal</span></div>${d[1].map((m,i)=>{let k=`m${di}-${i}`;return `<div class="item"><div class="row"><div><b>${m[0]}</b><div class="small">${m[1]}</div></div><button class="check ${state.checks[k]?"on":""}" onclick="toggleCheck('${k}',this)"></button></div></div>`}).join("")}</div>`).join("");
+document.getElementById("shopping").innerHTML=shop.map((x,i)=>{let k=`s${i}`;return `<div class="item"><div class="row"><span class="small">${x}</span><button class="check ${state.checks[k]?"on":""}" onclick="toggleCheck('${k}',this)"></button></div></div>`}).join("");
+}
+function update(){document.getElementById("water").textContent=state.water.toFixed(2).replace(".",",");document.getElementById("savedWater").textContent=state.water.toFixed(2).replace(".",",")+" L";document.getElementById("savedWeight").textContent=state.weight+" kg";document.getElementById("savedWorkouts").textContent=state.workouts;document.getElementById("weekly").textContent=state.workouts+" de 3 entrenamientos";let p=Math.round(state.workouts/3*100);document.getElementById("pct").textContent=p+"%";document.getElementById("bar").style.width=p+"%"}
+document.getElementById("date").textContent=new Date().toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
+render();update();
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+</script>
+</body></html>
